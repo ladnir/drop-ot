@@ -11,6 +11,7 @@
 #include "cryptoTools/Common/TestCollection.h"
 
 #include <thread>
+#include <sstream>
 
 namespace dropOt
 {
@@ -195,6 +196,17 @@ namespace dropOt
 
             baseOTs0.receiveRoundOne(choices, prng0, buff0);
             baseOTs1.sendRoundOne(numOTs, prng1, buff1);
+
+            std::stringstream ss0;
+            baseOTs0.serialize(ss0);
+            baseOTs0.resetState();
+            baseOTs0.deserialize(ss0);
+
+            std::stringstream ss1;
+            baseOTs1.serialize(ss1);
+            baseOTs1.resetState();
+            baseOTs1.deserialize(ss1);
+
 
             span<u8> span1 = buff1;
             span<u8> span0 = buff0;

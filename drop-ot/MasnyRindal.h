@@ -25,6 +25,71 @@ namespace dropOt
             mSk.resize(0);
         }
 
+        static constexpr auto header = "MasnyRindal";
+
+        void serialize(std::ostream& out)
+        {
+            out.write(header, std::strlen(header));
+            out.write((char*)&mState, sizeof(mState));
+
+            u64 size = mSk.size();
+            out.write((char*)&size, sizeof(size));
+
+            if (size)
+            {
+                std::vector<u8> buff;
+                size = mSk[0].sizeBytes();
+                out.write((char*)&size, sizeof(size));
+                buff.resize(size);
+                for (auto& sk : mSk)
+                {
+                    sk.toBytes(buff.data());
+                    out.write((char*)buff.data(), buff.size());
+                }
+            }
+        }
+
+
+        void deserialize(std::istream& in)
+        {
+            std::vector<u8> buff(std::strlen(header));
+            in.read((char*)buff.data(), buff.size());
+
+            if (std::memcmp(buff.data(), header, buff.size()))
+            {
+                std::cout << header << " failed to deserialize. Bad header. " LOCATION << std::endl;
+                throw RTE_LOC;
+            }
+
+            in.read((char*)&mState, sizeof(mState));
+
+            if (mState != State::RoundOne && mState != State::RoundTwo)
+            {
+                std::cout << header << " failed to deserialize. Bad state. " LOCATION << std::endl;
+                throw RTE_LOC;
+            }
+
+            u64 size; 
+            in.read((char*)&size, sizeof(size));
+            mSk.resize(size);
+
+            if (size)
+            {
+                u64 size2;
+                in.read((char*)&size2, sizeof(size2));
+                if (size2 != mSk[0].sizeBytes())
+                {
+                    std::cout << header << " failed to deserialize. Bad sk key size. " LOCATION << std::endl;
+                    throw RTE_LOC;
+                }
+            }
+            for (auto i = 0; i < size; ++i)
+            {
+                buff.resize(mSk[i].sizeBytes());
+                in.read((char*)buff.data(), buff.size());
+                mSk[i].fromBytes(buff.data());
+            }
+        }
 
         // Perform round 1 of the OT-receiver
         // protocol. Will return a dropOt::code

@@ -14,13 +14,9 @@ namespace dropOt {
     {
     public:
 
-        //std::array<PRNG, gOtExtBaseOtCount> mGens;
         u64 mPrngIdx = 0;
         oc::MultiKeyAES<gOtExtBaseOtCount> mGens;
         BitVector mBaseChoiceBits;
-
-        std::vector<block> mMessages;
-
 
         IknpOtExtSender() = default;
         IknpOtExtSender(const IknpOtExtSender&) = delete;
@@ -78,10 +74,65 @@ namespace dropOt {
         //error_code sendRoundTwo_r(
         //    PRNG& prng,
         //    IOHandler& chl);
+
+
+
+        static constexpr auto header = "iknp-sender";
+
+        void serialize(std::ostream& out)
+        {
+            out.write(header, std::strlen(header));
+            bool hasBase = hasBaseOts();
+
+            out.write((char*)&hasBase, sizeof(hasBase));
+            out.write((char*)&mPrngIdx, sizeof(mPrngIdx));
+
+            if (hasBase)
+            {
+                out.write((char*)mBaseChoiceBits.data(), mBaseChoiceBits.sizeBytes());
+
+                for (u64 i = 0; i < mGens.mAESs.size(); ++i)
+                {
+                    auto k = mGens.mAESs[i].getKey();
+                    out.write((char*)&k, sizeof(k));
+                }
+            }
+        }
+
+        void deserialize(std::istream& in)
+        {
+            std::vector<u8> buff(std::strlen(header));
+            in.read((char*)buff.data(), buff.size());
+
+            if (std::memcmp(buff.data(), header, buff.size()))
+            {
+                std::cout << header << " failed to deserialize. Bad header. " LOCATION << std::endl;
+                throw RTE_LOC;
+            }
+
+            bool hasBase;
+
+            in.read((char*)&hasBase, sizeof(hasBase));
+            in.read((char*)&mPrngIdx, sizeof(mPrngIdx));
+
+            if (hasBase)
+            {
+                mBaseChoiceBits.resize(gOtExtBaseOtCount);
+                in.read((char*)mBaseChoiceBits.data(), mBaseChoiceBits.sizeBytes());
+
+                for (u64 i = 0; i < mGens.mAESs.size(); ++i)
+                {
+                    block k;
+                    in.read((char*)&k, sizeof(k));
+                    mGens.mAESs[i].setKey(k);
+                }
+            }
+        }
+
     };
 
 
-    class KosOtExtReceiver
+    class IknpOtExtReceiver
     {
     public:
 
@@ -90,12 +141,12 @@ namespace dropOt {
         oc::AlignedArray<oc::MultiKeyAES<gOtExtBaseOtCount>, 2> mGens;
         u64 mPrngIdx = 0;
 
-        KosOtExtReceiver() = default;
-        KosOtExtReceiver(const KosOtExtReceiver&) = delete;
-        KosOtExtReceiver(KosOtExtReceiver&&) = default;
-        KosOtExtReceiver(span<std::array<block, 2>> baseSendOts);
+        IknpOtExtReceiver() = default;
+        IknpOtExtReceiver(const IknpOtExtReceiver&) = delete;
+        IknpOtExtReceiver(IknpOtExtReceiver&&) = default;
+        IknpOtExtReceiver(span<std::array<block, 2>> baseSendOts);
 
-        void operator=(KosOtExtReceiver&& v)
+        void operator=(IknpOtExtReceiver&& v)
         {
             mHasBase = std::move(v.mHasBase);
             mGens = std::move(v.mGens);
@@ -115,7 +166,7 @@ namespace dropOt {
         // returns an independent instance of this extender which can securely be
         // used concurrently to this current one. The base OTs for the new instance 
         // are derived from the orginial base OTs.
-        //KosOtExtReceiver splitBase();
+        //IknpOtExtReceiver splitBase();
 
         // The first round of the OT-receiver protocol. This will send a message. 
         // This function can return early with a code::suspend error in which
@@ -129,6 +180,57 @@ namespace dropOt {
             span<block> messages,
             PRNG& prng,
             std::vector<u8>& ioBuffer);
+
+
+        static constexpr auto header = "iknp-recver";
+
+        void serialize(std::ostream& out)
+        {
+            out.write(header, std::strlen(header));
+
+            out.write((char*)&mHasBase, sizeof(mHasBase));
+            out.write((char*)&mPrngIdx, sizeof(mPrngIdx));
+
+            if (mHasBase)
+            {
+                for (u64 i = 0; i < mGens[0].mAESs.size(); ++i)
+                {
+                    auto k0 = mGens[0].mAESs[i].getKey();
+                    auto k1 = mGens[1].mAESs[i].getKey();
+
+                    out.write((char*)&k0, sizeof(k0));
+                    out.write((char*)&k1, sizeof(k1));
+                }
+            }
+        }
+
+        void deserialize(std::istream& in)
+        {
+            std::vector<u8> buff(std::strlen(header));
+            in.read((char*)buff.data(), buff.size());
+
+            if (std::memcmp(buff.data(), header, buff.size()))
+            {
+                std::cout << header << " failed to deserialize. Bad header. " LOCATION << std::endl;
+                throw RTE_LOC;
+            }
+
+            in.read((char*)&mHasBase, sizeof(mHasBase));
+            in.read((char*)&mPrngIdx, sizeof(mPrngIdx));
+
+            if (mHasBase)
+            {
+                for (u64 i = 0; i < mGens[0].mAESs.size(); ++i)
+                {
+                    block k0;
+                    block k1;
+                    in.read((char*)&k0, sizeof(k0));
+                    in.read((char*)&k1, sizeof(k1));
+                    mGens[0].mAESs[i].setKey(k0);
+                    mGens[1].mAESs[i].setKey(k1);
+                }
+            }
+        }
 
     };
 

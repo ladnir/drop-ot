@@ -9,6 +9,7 @@
 #include "cryptoTools/Common/TestCollection.h"
 #include "Tools.h"
 #include <thread>
+#include <sstream>
 
 #define OTE_RANDOM_ORACLE 1
 #define OTE_DAVIE_MEYER_AES 2
@@ -20,6 +21,7 @@ namespace dropOt
 
     void IknpOtExtSender::setUniformBaseOts(span<block> baseRecvOts, const BitVector & choices)
     {
+        mPrngIdx = 0;
         mBaseChoiceBits = choices;
         mGens.setKeys(baseRecvOts);
     }
@@ -190,13 +192,14 @@ namespace dropOt
 #endif
     }
 
-    KosOtExtReceiver::KosOtExtReceiver(span<std::array<block, 2>> baseOTs)
+    IknpOtExtReceiver::IknpOtExtReceiver(span<std::array<block, 2>> baseOTs)
     {
         setUniformBaseOts(baseOTs);
     }
 
-    void KosOtExtReceiver::setUniformBaseOts(span<std::array<block, 2>> baseOTs)
+    void IknpOtExtReceiver::setUniformBaseOts(span<std::array<block, 2>> baseOTs)
     {
+        mPrngIdx = 0;
         for (u64 j = 0; j < 2; ++j)
         {
             block buff[gOtExtBaseOtCount];
@@ -209,7 +212,7 @@ namespace dropOt
         mHasBase = true;
     }
 
-    void KosOtExtReceiver::receiveRoundOne_s(
+    void IknpOtExtReceiver::receiveRoundOne_s(
         const BitVector& choices,
         span<block> messages,
         PRNG& prng,
@@ -391,12 +394,28 @@ namespace dropOt
             }
 
             IknpOtExtSender sender;
-            KosOtExtReceiver recv;
+            IknpOtExtReceiver recv;
             recv.setUniformBaseOts(baseSend);
             sender.setUniformBaseOts(baseRecv, baseChoice);
 
-            std::vector<u8> buffer;
+            recv.mPrngIdx = 42;
+            sender.mPrngIdx = 42;
 
+            std::stringstream rss, sss;
+            recv.serialize(rss);
+            recv = {};
+            recv.deserialize(rss);
+            if (recv.mPrngIdx != 42)
+                throw RTE_LOC;
+
+
+            sender.serialize(rss);
+            sender = {};
+            sender.deserialize(rss);
+            if (sender.mPrngIdx != 42)
+                throw RTE_LOC;
+
+            std::vector<u8> buffer;
             recv.receiveRoundOne_s(choices, recvMsg, prng0, buffer);
                 
             span<u8> bSpan = buffer;
