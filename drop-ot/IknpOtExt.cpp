@@ -223,7 +223,6 @@ namespace dropOt
 
         auto numOtExt = u64{};
         auto numSuperBlocks = u64{};
-        auto numBlocks = u64{};
         auto superBlkIdx = u64{};
         auto step = u64{};
         auto choiceBlocks = span<block>{};
@@ -238,7 +237,6 @@ namespace dropOt
         // we are going to process OTs in blocks of 128 * superBlkSize messages.
         numOtExt = roundUpTo(choices.size(), 128);
         numSuperBlocks = (numOtExt / 128);
-        numBlocks = numSuperBlocks;
 
         choiceBlocks = { choices.blocks(), choices.sizeBlocks() };
 

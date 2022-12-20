@@ -45,7 +45,6 @@ namespace dropOt
         {
             // We process things in batches of max size step. We 
             // then send those off before the next step is started.
-            auto curStep = std::min<u64>(n - i, step);
             auto& rrNot = r[choices[i] ^ 1];
             auto& rr = r[choices[i]];
 
