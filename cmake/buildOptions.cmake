@@ -8,7 +8,8 @@ macro(EVAL var)
 endmacro()
 
 option(DROP_OT_FETCH_AUTO      "automatically download and build dependencies" OFF)
-option(DROP_OT_ENABLE_BOOST    "build the library with boost asio networking" OFF)
+option(DROP_OT_ENABLE_SSE      "build with sse" ON)
+option(DROP_OT_ENABLE_AVX      "build with avx" ON)
 
 
 #option(DROP_OT_FETCH_CRYPTOTOOLS		"download and build CRYPTOTOOLS" OFF))
@@ -22,5 +23,7 @@ message(STATUS "dropOt options\n================================================
 
 message(STATUS "Option: DROP_OT_FETCH_AUTO        = ${DROP_OT_FETCH_AUTO}")
 message(STATUS "Option: DROP_OT_FETCH_CRYPTOTOOLS = ${DROP_OT_FETCH_CRYPTOTOOLS}\n")
+message(STATUS "Option: DROP_OT_ENABLE_SSE        = ${DROP_OT_ENABLE_SSE}\n")
+message(STATUS "Option: DROP_OT_ENABLE_AVX        = ${DROP_OT_ENABLE_AVX}\n")
 
 

@@ -25,6 +25,8 @@ if(NOT ${DEP_NAME}_FOUND OR CRYPTOTOOLS_DEV)
                        -DENABLE_CIRCUITS=OFF
                        -DENABLE_RELIC=ON 
                        -DENABLE_BOOST=false
+                       -DENABLE_SSE=${DROP_OT_ENABLE_SSE}
+                       -DENABLE_AVX=${DROP_OT_ENABLE_AVX}
                        )
     set(BUILD_CMD     ${CMAKE_COMMAND} --build ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE})
     set(INSTALL_CMD   ${CMAKE_COMMAND} --install ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE} --prefix ${DROP_OT_THIRDPARTY_DIR})
