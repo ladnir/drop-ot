@@ -24,8 +24,8 @@ target_link_libraries(dropOt oc::cryptoTools)
 
 
 if(MSVC)
-    target_compile_options(dropOt PRIVATE $<$<COMPILE_LANGUAGE:CXX>:/std:c++${DROP_OT_STD_VER}>)
+    target_compile_options(dropOt PUBLIC $<$<COMPILE_LANGUAGE:CXX>:/std:c++${DROP_OT_STD_VER}>)
     
 else()
-    target_compile_options(dropOt PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++${DROP_OT_STD_VER}> -pthread)
+    target_compile_options(dropOt PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-std=c++${DROP_OT_STD_VER}> -pthread)
 endif()
