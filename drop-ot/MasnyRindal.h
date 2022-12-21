@@ -18,12 +18,18 @@ namespace dropOt
         // The secret keys of each party.
         std::vector<Number> mSk;
 
+        // receiver choice bits.
+        BitVector mChoices;
+
         // The current state of the protocol.
         State mState = State::RoundOne;
         void resetState() { 
             mState = State::RoundOne; 
             mSk.resize(0);
+            mChoices.resize(0);
         }
+
+
 
         static constexpr auto header = "MasnyRindal";
 
@@ -46,6 +52,14 @@ namespace dropOt
                     sk.toBytes(buff.data());
                     out.write((char*)buff.data(), buff.size());
                 }
+            }
+
+            size = mChoices.size();
+            out.write((char*)&size, sizeof(size));
+            if (size)
+            {
+                out.write((char*)mChoices.data(), mChoices.sizeBytes());
+
             }
         }
 
@@ -89,7 +103,16 @@ namespace dropOt
                 in.read((char*)buff.data(), buff.size());
                 mSk[i].fromBytes(buff.data());
             }
+
+
+            in.read((char*)&size, sizeof(size));
+            if (size)
+            {
+                mChoices.resize(size);
+                in.read((char*)mChoices.data(), mChoices.sizeBytes());
+            }
         }
+
 
         // Perform round 1 of the OT-receiver
         // protocol. Will return a dropOt::code
@@ -98,7 +121,7 @@ namespace dropOt
         // @prng, input: the source of randomness.
         // @chl, input: the location the io should be send/recv.
         void receiveRoundOne(
-            const BitVector& choices,
+            BitVector choices,
             PRNG& prng,
             std::vector<u8>& ioBuffer);
 
@@ -112,7 +135,6 @@ namespace dropOt
         // @prng, input: the source of randomness.
         // @chl, input: the location the io should be send/recv.
         void receiveRoundTwo(
-            const BitVector& choices,
             span<block> messages,
             PRNG& prng,
             span<u8>& ioBuffer);

@@ -32,6 +32,9 @@ namespace dropOt
         span<u8>& buffer)
     {
 
+        if (hasBaseOts() == false)
+            panic("IknpOtExtSender has no base OTs");
+
         auto numOtExt = u64{};
         auto numSuperBlocks = u64{};
         auto step = u64{};

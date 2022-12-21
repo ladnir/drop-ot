@@ -19,14 +19,17 @@ namespace dropOt
     const u64 step = 16;
 
     void MasnyRindal::receiveRoundOne(
-        const BitVector& choices,
+        BitVector choices_,
         PRNG& prng,
         std::vector<u8>& ioBuffer)
     {
         if (mState != State::RoundOne)
             panic("bad state, " LOCATION);
 
-        auto n = choices.size();
+
+        mChoices = std::move(choices_);
+
+        auto n = mChoices.size();
         Curve curve;
         std::array<Point, 2> r{ curve, curve };
         auto g = curve.getGenerator();
@@ -46,8 +49,8 @@ namespace dropOt
         {
             // We process things in batches of max size step. We 
             // then send those off before the next step is started.
-            auto& rrNot = r[choices[i] ^ 1];
-            auto& rr = r[choices[i]];
+            auto& rrNot = r[mChoices[i] ^ 1];
+            auto& rr = r[mChoices[i]];
 
             rrNot.randomize();
             rrNot.toBytes(hashBuff.data());
@@ -66,7 +69,6 @@ namespace dropOt
     }
 
     void MasnyRindal::receiveRoundTwo(
-        const BitVector& choices,
         span<block> messages,
         PRNG& prng,
         span<u8>& recvBuff)
@@ -76,7 +78,7 @@ namespace dropOt
 
         Curve curve;
         Point Mb(curve), k(curve);
-        auto n = choices.size();
+        auto n = mChoices.size();
         auto pointSize = curve.getGenerator().sizeBytes();
 
         if (recvBuff.size() != pointSize)
@@ -93,7 +95,7 @@ namespace dropOt
 
             k.toBytes(hashBuff.data());
             ro.Reset();
-            ro.Update(i * 2 + choices[i]);
+            ro.Update(i * 2 + mChoices[i]);
             ro.Update(hashBuff.data(), pointSize);
             ro.Final(messages[i]);
         }
@@ -210,7 +212,7 @@ namespace dropOt
 
             span<u8> span1 = buff1;
             span<u8> span0 = buff0;
-            baseOTs0.receiveRoundTwo(choices, recvMsg, prng0, span1);
+            baseOTs0.receiveRoundTwo(recvMsg, prng0, span1);
             baseOTs1.sendRoundTwo(sendMsg, prng1, span0);
 
             for (u64 i = 0; i < numOTs; ++i)
