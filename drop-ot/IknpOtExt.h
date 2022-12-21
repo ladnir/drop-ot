@@ -65,20 +65,7 @@ namespace dropOt {
             PRNG& prng,
             span<u8>& ioBuffer);
 
-        // The second round of the OT-sender protocol. This will receive a 
-        // message. 
-        // This function can return early with a code::suspend error in which
-        // case the caller should perform io and call the function again.
-        // @prng, input: the randomness source.
-        // @chl, input: the io buffer/socket.
-        //error_code sendRoundTwo_r(
-        //    PRNG& prng,
-        //    IOHandler& chl);
-
-
-
         static constexpr auto header = "iknp-sender";
-
         void serialize(std::ostream& out)
         {
             out.write(header, std::strlen(header));
