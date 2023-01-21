@@ -24,6 +24,7 @@ if(NOT ${DEP_NAME}_FOUND OR CRYPTOTOOLS_DEV)
                        -DVERBOSE_FETCH=true
                        -DENABLE_CIRCUITS=OFF
                        -DENABLE_RELIC=${DROP_OT_ENABLE_RELIC} 
+                       -DRELIC_GIT_TAG=0.6.0-patch
                        -DENABLE_SODIUM=${DROP_OT_ENABLE_SODIUM} 
                        -DENABLE_BOOST=false
                        -DENABLE_SSE=${DROP_OT_ENABLE_SSE}
