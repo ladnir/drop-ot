@@ -11,7 +11,9 @@ option(DROP_OT_FETCH_AUTO      "automatically download and build dependencies" O
 option(DROP_OT_ENABLE_SSE      "build with sse" ON)
 option(DROP_OT_ENABLE_AVX      "build with avx" ON)
 option(DROP_OT_ENABLE_PIC      "build with PIC" OFF)
-option(DROP_OT_ENABLE_ASAN      "build with asan" OFF)
+option(DROP_OT_ENABLE_ASAN     "build with asan" OFF)
+option(DROP_OT_ENABLE_RELIC    "build with Relic" ON)
+option(DROP_OT_ENABLE_SODIUM   "build with Sodium" OFF)
 
 if(NOT DEFINED DROP_OT_STD_VER)
     set(DROP_OT_STD_VER 14)
@@ -32,6 +34,8 @@ message(STATUS "Option: DROP_OT_ENABLE_SSE        = ${DROP_OT_ENABLE_SSE}")
 message(STATUS "Option: DROP_OT_ENABLE_AVX        = ${DROP_OT_ENABLE_AVX}")
 message(STATUS "Option: DROP_OT_ENABLE_PIC        = ${DROP_OT_ENABLE_PIC}")
 message(STATUS "Option: DROP_OT_ENABLE_ASAN       = ${DROP_OT_ENABLE_ASAN}")
+message(STATUS "Option: DROP_OT_ENABLE_RELIC      = ${DROP_OT_ENABLE_RELIC}")
+message(STATUS "Option: DROP_OT_ENABLE_SODIUM     = ${DROP_OT_ENABLE_SODIUM}")
 message(STATUS "Option: DROP_OT_STD_VER           = ${DROP_OT_STD_VER}\n")
 
 

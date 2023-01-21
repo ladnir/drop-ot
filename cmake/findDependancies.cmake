@@ -12,13 +12,30 @@ set(CMAKE_PREFIX_PATH "${DROP_OT_THIRDPARTY_DIR};${CMAKE_PREFIX_PATH}")
 
 macro(FIND_CRYPTOTOOLS)
     set(ARGS ${ARGN})
-
+    set(COMP)
+    
+    if(DROP_OT_ENABLE_RELIC)
+        set(COMP ${COMP} relic)
+    else()
+        #set(COMP ${COMP} no_relic)
+    endif()
+    if(DROP_OT_ENABLE_SODIUM)
+        set(COMP ${COMP} sodium)
+    else()
+        #set(COMP ${COMP} no_sodium)
+    endif()
+    #if(DROP_OT_ENABLE_PIC)
+    #    set(COMP ${COMP} pic)
+    #else()
+    #    set(COMP ${COMP} no_pic)
+    #endif()
+    message(STATUS "COMP=${COMP}")
     #explicitly asked to fetch CRYPTOTOOLS
     if(FETCH_CRYPTOTOOLS)
         list(APPEND ARGS NO_DEFAULT_PATH PATHS ${DROP_OT_THIRDPARTY_DIR})
     endif()
     
-    find_package(cryptoTools ${ARGS})
+    find_package(cryptoTools ${ARGS} COMPONENTS ${COMP})
 
     if(TARGET oc::cryptoTools)
         set(CRYPTOTOOLS_FOUND ON)

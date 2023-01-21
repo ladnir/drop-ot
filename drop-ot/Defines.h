@@ -2,7 +2,6 @@
 #include "drop-ot/config.h"
 #include "cryptoTools/Common/Defines.h"
 #include "cryptoTools/Common/Version.h"
-#include "cryptoTools/Crypto/RCurve.h"
 #include "cryptoTools/Crypto/PRNG.h"
 #include "cryptoTools/Network/Channel.h"
 #include "cryptoTools/Common/BitVector.h"
@@ -13,12 +12,20 @@
 static_assert(0, "please update cryptoTools");
 #endif
 
+#ifdef DROP_OT_ENABLE_RELIC
+#include "cryptoTools/Crypto/RCurve.h"
+
 #ifndef ENABLE_RELIC
 static_assert(0, "please enable relic in cryptoTools");
 #endif
 
 #if !defined(MULTI) || ((MULTI != PTHREAD) && (MULTI != OPENMP))
 static_assert(0,"Relic must be built with -DMULTI=PTHREAD or -DMULTI=OPENMP");
+#endif
+#endif
+#ifdef DROP_OT_ENABLE_SODIUM
+#include "cryptoTools/Crypto/SodiumCurve.h"
+
 #endif
 
 namespace dropOt
@@ -40,10 +47,18 @@ namespace dropOt
     inline block toBlock(u64 low_u64) { return oc::toBlock(low_u64); }
     inline block toBlock(u64 high_u64, u64 low_u64) { return oc::toBlock(high_u64, low_u64); }
 
-    static const u64 gDefaultCurve = (u64)SECG_K256;
+    
+#ifdef DROP_OT_ENABLE_RELIC
     using Number = oc::REccNumber;
     using Point = oc::REccPoint;
     using Curve = oc::REllipticCurve;
+#else
+
+    using Number = oc::Sodium::Prime25519;
+    using Point = oc::Sodium::Rist25519;
+    //using Curve = oc::REllipticCurve;
+    struct Curve { Curve() {} };
+#endif
 
 #ifdef ENABLE_BOOST
     using Channel = oc::Channel;

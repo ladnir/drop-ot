@@ -15,8 +15,6 @@
 
 namespace dropOt
 {
-    using Brick = oc::REccPoint;
-    const u64 step = 16;
 
     void MasnyRindal::receiveRoundOne(
         BitVector choices_,
@@ -31,11 +29,10 @@ namespace dropOt
 
         auto n = mChoices.size();
         Curve curve;
-        std::array<Point, 2> r{ curve, curve };
-        auto g = curve.getGenerator();
-        auto pointSize = g.sizeBytes();
+        std::array<Point, 2> r;
+        auto pointSize = Point::size;
 
-        Point hPoint(curve);
+        Point hPoint;
         std::vector<u8> hashBuff(roundUpTo(pointSize, 16));
         mSk = {};
         mSk.reserve(n);
@@ -52,12 +49,12 @@ namespace dropOt
             auto& rrNot = r[mChoices[i] ^ 1];
             auto& rr = r[mChoices[i]];
 
-            rrNot.randomize();
+            rrNot.randomize(prng);
             rrNot.toBytes(hashBuff.data());
-            ep_map(hPoint, hashBuff.data(), int(pointSize));
+            hPoint.fromHash(hashBuff.data(), pointSize);
 
-            mSk.emplace_back(curve, prng);
-            rr = g * mSk[i];
+            mSk.emplace_back(prng);
+            rr = Point::mulGenerator(mSk[i]);
             rr -= hPoint;
 
             r[0].toBytes(buff.subspan(0, pointSize).data()); buff = buff.subspan(pointSize);
@@ -77,9 +74,9 @@ namespace dropOt
             panic("bad state, " LOCATION);
 
         Curve curve;
-        Point Mb(curve), k(curve);
+        Point Mb, k;
         auto n = mChoices.size();
-        auto pointSize = curve.getGenerator().sizeBytes();
+        auto pointSize = Point::size;
 
         if (recvBuff.size() != pointSize)
             throw RTE_LOC;
@@ -112,14 +109,12 @@ namespace dropOt
             panic("bad state, " LOCATION);
 
         Curve curve;
-        auto g = curve.getGenerator();
-        auto pointSize = g.sizeBytes();
+        auto pointSize = Point::size;
         mSk = {};
         mSk.emplace_back();
         mSk[0].randomize(prng);
 
-        Point Mb = g;
-        Mb *= mSk[0];
+        Point Mb = Point::mulGenerator(mSk[0]);
 
         auto begin = buff.size();
         buff.resize(begin + pointSize);
@@ -140,12 +135,11 @@ namespace dropOt
 
         u64 n = static_cast<u64>(messages.size());
         Curve curve;
-        auto g = curve.getGenerator();
-        auto pointSize = g.sizeBytes();
+        auto pointSize = Point::size;
         oc::RandomOracle ro(sizeof(block));
 
         std::vector<u8> hashBuff(roundUpTo(pointSize, 16));
-        Point pHash(curve), r(curve);
+        Point pHash, r;
 
         if (buff.size() != n * pointSize * 2)
             throw RTE_LOC;
@@ -162,7 +156,7 @@ namespace dropOt
             {
 
                 r.fromBytes(buffIters[j].data());
-                ep_map(pHash, buffIters[j ^ 1].data(), int(pointSize));
+                pHash.fromHash(buffIters[j ^ 1].data(), int(pointSize));
                 r += pHash;
                 r *= mSk[0];
 
@@ -204,10 +198,10 @@ namespace dropOt
             baseOTs0.resetState();
             baseOTs0.deserialize(ss0);
 
-            std::stringstream ss1;
-            baseOTs1.serialize(ss1);
-            baseOTs1.resetState();
-            baseOTs1.deserialize(ss1);
+            //std::stringstream ss1;
+            //baseOTs1.serialize(ss1);
+            //baseOTs1.resetState();
+            //baseOTs1.deserialize(ss1);
 
 
             span<u8> span1 = buff1;

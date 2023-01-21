@@ -1,7 +1,7 @@
 
 set(DEP_NAME            cryptoTools)          
 set(GIT_REPOSITORY      "https://github.com/ladnir/cryptoTools.git")
-set(GIT_TAG             "c3196e5585fbc9e04f9f07b2e440ffe3b3b18303" )
+set(GIT_TAG             "efc50d5bab703245b03ae4e28e6ddab579f1d4aa" )
 
 set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
 set(BUILD_DIR "${CLONE_DIR}/out/build/${DROP_OT_CONFIG}")
@@ -23,7 +23,8 @@ if(NOT ${DEP_NAME}_FOUND OR CRYPTOTOOLS_DEV)
                        -DFETCH_AUTO=ON 
                        -DVERBOSE_FETCH=true
                        -DENABLE_CIRCUITS=OFF
-                       -DENABLE_RELIC=ON 
+                       -DENABLE_RELIC=${DROP_OT_ENABLE_RELIC} 
+                       -DENABLE_SODIUM=${DROP_OT_ENABLE_SODIUM} 
                        -DENABLE_BOOST=false
                        -DENABLE_SSE=${DROP_OT_ENABLE_SSE}
                        -DENABLE_AVX=${DROP_OT_ENABLE_AVX}

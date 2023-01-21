@@ -45,6 +45,7 @@ namespace dropOt
             {
                 std::vector<u8> buff;
                 size = mSk[0].sizeBytes();
+
                 out.write((char*)&size, sizeof(size));
                 buff.resize(size);
                 for (auto& sk : mSk)

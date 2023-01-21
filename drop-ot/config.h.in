@@ -9,6 +9,8 @@
 
 // enable integration with boost for networking.
 #cmakedefine ENABLE_BOOST @ENABLE_BOOST@
+#cmakedefine DROP_OT_ENABLE_RELIC @DROP_OT_ENABLE_RELIC@
+#cmakedefine DROP_OT_ENABLE_SODIUM @DROP_OT_ENABLE_SODIUM@
 
 
 #if defined(ENABLE_BOOST) != defined(OC_ENABLE_BOOST)

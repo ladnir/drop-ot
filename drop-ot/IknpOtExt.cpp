@@ -81,6 +81,8 @@ namespace dropOt
                 uIter = u.data();
 
                 std::copy(buffer.begin(), buffer.begin() + recvView.size(), recvView.begin());
+                buffer = buffer.subspan(recvView.size());
+
             }
 
             mGens.ecbEncCounterMode(mPrngIdx, tIter);
@@ -381,7 +383,7 @@ namespace dropOt
             PRNG prng0(toBlock(4253465, 3434565));
             PRNG prng1(toBlock(233465, 334565));
 
-            u64 numOTs = 20000;
+            u64 numOTs = 1<<17;
 
             std::vector<block> recvMsg(numOTs), baseRecv(128);
             std::vector<std::array<block, 2>> sendMsg(numOTs), baseSend(128);
