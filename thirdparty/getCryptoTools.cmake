@@ -1,7 +1,7 @@
 
 set(DEP_NAME            cryptoTools)          
 set(GIT_REPOSITORY      "https://github.com/ladnir/cryptoTools.git")
-set(GIT_TAG             "efc50d5bab703245b03ae4e28e6ddab579f1d4aa" )
+set(GIT_TAG             "1d5bfdd3a302f9ed2311cd3e916abab4926fb28b" )
 
 set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
 set(BUILD_DIR "${CLONE_DIR}/out/build/${DROP_OT_CONFIG}")
