@@ -1,14 +1,14 @@
 
 set(DEP_NAME            cryptoTools)          
 set(GIT_REPOSITORY      "https://github.com/ladnir/cryptoTools.git")
-set(GIT_TAG             "1d5bfdd3a302f9ed2311cd3e916abab4926fb28b" )
+set(GIT_TAG             "2746cf2e12ce5995b211fc4d125ab36de012b042" )
 
 set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
 set(BUILD_DIR "${CLONE_DIR}/out/build/${DROP_OT_CONFIG}")
 set(LOG_FILE  "${CMAKE_CURRENT_LIST_DIR}/log-${DEP_NAME}.txt")
 
 
-include("${CMAKE_CURRENT_LIST_DIR}/fetch.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/fetch.cmake") 
 
 option(CRYPTOTOOLS_DEV "always build CRYPTOTOOLS" OFF)
 
