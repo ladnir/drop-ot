@@ -11,7 +11,10 @@
         "CMAKE_BUILD_TYPE": "Release",
         "HYDRA_FETCH_AUTO": true,
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-        "DROP_OT_FETCH_CRYPTOTOOLS": true
+        "DROP_OT_FETCH_CRYPTOTOOLS": true,
+        "DROP_OT_ENABLE_PIC": true,
+        "DROP_OT_ENABLE_RELIC": true,
+        "DROP_OT_ENABLE_SODIUM": false
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
