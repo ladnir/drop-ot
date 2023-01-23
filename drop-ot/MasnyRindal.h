@@ -35,6 +35,8 @@ namespace dropOt
 
         void serialize(std::ostream& out)
         {
+            Curve curve;
+
             out.write(header, std::strlen(header));
             out.write((char*)&mState, sizeof(mState));
 
@@ -84,7 +86,8 @@ namespace dropOt
                 throw RTE_LOC;
             }
 
-            u64 size; 
+            Curve curve;
+            u64 size;
             in.read((char*)&size, sizeof(size));
             mSk.resize(size);
 
